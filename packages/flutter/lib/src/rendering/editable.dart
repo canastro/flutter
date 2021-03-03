@@ -979,7 +979,7 @@ class RenderEditable extends RenderBox with RelayoutWhenSystemFontsChangeMixin {
     }
   }
 
-  /// Computes the text after a delete event with a alt or meta modifier
+  /// Computes the text after a delete event with a alt or meta modifier.
   String _computeDeletedBeforeTextWithModifier({
     required String text,
     bool isWordModifierPressed = false,
@@ -999,7 +999,7 @@ class RenderEditable extends RenderBox with RelayoutWhenSystemFontsChangeMixin {
     return result.substring(0, characterBoundary);
   }
 
-  /// Computes the text after a delete event
+  /// Computes the text after a delete event.
   String _computeDeletedBeforeText({ required String text }) {
     return text.substring(0, previousCharacter(text.length, text));
   }
