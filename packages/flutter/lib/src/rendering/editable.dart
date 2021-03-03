@@ -990,16 +990,14 @@ class RenderEditable extends RenderBox with RelayoutWhenSystemFontsChangeMixin {
       return ''; 
     } 
 
-    String result = text.trimRight();
-    final int characterBoundary = _getLeftByWord(_textPainter, text.length - 1, false);
-    result = result.substring(0, characterBoundary);
-    return result;
+    final String result = text.trimRight();
+    final int characterBoundary = _getLeftByWord(_textPainter, text.length, false);
+    return result.substring(0, characterBoundary);
   }
 
   /// Computes the text after a delete event
   String _computeBeforeTextWithBackspace({ required String text }) {
-    final int characterBoundary = previousCharacter(text.length, text);
-    return text.substring(0, characterBoundary);
+    return text.substring(0, previousCharacter(text.length, text));
   }
 
   void _handleDelete({ 

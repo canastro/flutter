@@ -1730,6 +1730,48 @@ void main() {
       expect(delegate.textEditingValue.selection.baseOffset, 5);
     }, skip: isBrowser);
 
+    test('handles block deletion with alt modifier when cursor is after a block', () async {
+      const String text = 'test with multiple blocks';
+      const int offset = 9;
+      final TextSelectionDelegate delegate = FakeEditableTextState()
+        ..textEditingValue = const TextEditingValue(
+            text: text,
+            selection: TextSelection.collapsed(offset: offset),
+          );
+      final ViewportOffset viewportOffset = ViewportOffset.zero();
+      final RenderEditable editable = RenderEditable(
+        backgroundCursorColor: Colors.grey,
+        selectionColor: Colors.black,
+        textDirection: TextDirection.ltr,
+        cursorColor: Colors.red,
+        offset: viewportOffset,
+        textSelectionDelegate: delegate,
+        onSelectionChanged: (TextSelection selection, RenderEditable renderObject, SelectionChangedCause cause) {},
+        startHandleLayerLink: LayerLink(),
+        endHandleLayerLink: LayerLink(),
+        text: const TextSpan(
+          text: text,
+          style: TextStyle(
+            height: 1.0, fontSize: 10.0, fontFamily: 'Ahem',
+          ),
+        ),
+        selection: const TextSelection.collapsed(offset: offset),
+      );
+
+      layout(editable);
+      editable.hasFocus = true;
+      pumpFrame();
+
+      await simulateKeyDownEvent(LogicalKeyboardKey.alt);
+      await simulateKeyDownEvent(LogicalKeyboardKey.backspace);
+      await simulateKeyUpEvent(LogicalKeyboardKey.backspace);
+      await simulateKeyUpEvent(LogicalKeyboardKey.alt);
+
+      expect(delegate.textEditingValue.text, 'test  multiple blocks');
+      expect(delegate.textEditingValue.selection.isCollapsed, true);
+      expect(delegate.textEditingValue.selection.baseOffset, 5);
+    }, skip: isBrowser);
+
     test('handles block deletion with alt modifier when cursor is preceeded by white spaces', () async {
       const String text = 'test with   multiple blocks';
       const int offset = 12;
@@ -1854,6 +1896,48 @@ void main() {
       expect(delegate.textEditingValue.text, 'test with\n\nmultiple blocks');
       expect(delegate.textEditingValue.selection.isCollapsed, true);
       expect(delegate.textEditingValue.selection.baseOffset, 11);
+    }, skip: isBrowser);
+  
+    test('handles block deletion with alt modifier when using cjk chinese', () async {
+      const String text = '用多個塊測試';
+      const int offset = 4;
+      final TextSelectionDelegate delegate = FakeEditableTextState()
+        ..textEditingValue = const TextEditingValue(
+            text: text,
+            selection: TextSelection.collapsed(offset: offset),
+          );
+      final ViewportOffset viewportOffset = ViewportOffset.zero();
+      final RenderEditable editable = RenderEditable(
+        backgroundCursorColor: Colors.grey,
+        selectionColor: Colors.black,
+        textDirection: TextDirection.ltr,
+        cursorColor: Colors.red,
+        offset: viewportOffset,
+        textSelectionDelegate: delegate,
+        onSelectionChanged: (TextSelection selection, RenderEditable renderObject, SelectionChangedCause cause) {},
+        startHandleLayerLink: LayerLink(),
+        endHandleLayerLink: LayerLink(),
+        text: const TextSpan(
+          text: text,
+          style: TextStyle(
+            height: 1.0, fontSize: 10.0, fontFamily: 'Ahem',
+          ),
+        ),
+        selection: const TextSelection.collapsed(offset: offset),
+      );
+
+      layout(editable);
+      editable.hasFocus = true;
+      pumpFrame();
+
+      await simulateKeyDownEvent(LogicalKeyboardKey.alt);
+      await simulateKeyDownEvent(LogicalKeyboardKey.backspace);
+      await simulateKeyUpEvent(LogicalKeyboardKey.backspace);
+      await simulateKeyUpEvent(LogicalKeyboardKey.alt);
+
+      expect(delegate.textEditingValue.text, '用多個測試');
+      expect(delegate.textEditingValue.selection.isCollapsed, true);
+      expect(delegate.textEditingValue.selection.baseOffset, 3);
     }, skip: isBrowser);
   });
 
