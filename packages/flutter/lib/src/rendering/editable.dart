@@ -637,7 +637,7 @@ class RenderEditable extends RenderBox with RelayoutWhenSystemFontsChangeMixin {
     final Set<LogicalKeyboardKey> keysPressed = LogicalKeyboardKey.collapseSynonyms(RawKeyboard.instance.keysPressed);
     final LogicalKeyboardKey key = keyEvent.logicalKey;
 
-    final bool isMacOS = defaultTargetPlatform == TargetPlatform.macOS;
+    final bool isMacOS = keyEvent.data is RawKeyEventDataMacOs;
     if (!_nonModifierKeys.contains(key) ||
         keysPressed.difference(isMacOS ? _macOsModifierKeys : _modifierKeys).length > 1 ||
         keysPressed.difference(_interestingKeys).isNotEmpty) {
@@ -660,15 +660,15 @@ class RenderEditable extends RenderBox with RelayoutWhenSystemFontsChangeMixin {
       _handleDelete(forward: true);
     } else if (key == LogicalKeyboardKey.backspace) {
       _handleDelete(
-        forward: false, 
-        isWordModifierPressed: isWordModifierPressed, 
+        forward: false,
+        isWordModifierPressed: isWordModifierPressed,
         isLineModifierPressed: isLineModifierPressed
       );
     } else if (isShortcutModifierPressed && _shortcutKeys.contains(key)) {
       // _handleShortcuts depends on being started in the same stack invocation
       // as the _handleKeyEvent method
       _handleShortcuts(key);
-    } 
+    }
   }
 
   // Return the offset at the start of the nearest word to the left of the given
@@ -980,10 +980,10 @@ class RenderEditable extends RenderBox with RelayoutWhenSystemFontsChangeMixin {
   }
 
   /// Computes the text after a delete event with a alt or meta modifier
-  String _computeDeletedBeforeTextWithModifier({ 
-    required String text, 
-    bool isWordModifierPressed = false, 
-    bool isLineModifierPressed = false 
+  String _computeDeletedBeforeTextWithModifier({
+    required String text,
+    bool isWordModifierPressed = false,
+    bool isLineModifierPressed = false
   }) {
     // if both modifiers are true, then we should ignore.
     if (isLineModifierPressed && isWordModifierPressed) {
@@ -991,8 +991,8 @@ class RenderEditable extends RenderBox with RelayoutWhenSystemFontsChangeMixin {
     }
 
     if (isLineModifierPressed) {
-      return ''; 
-    } 
+      return '';
+    }
 
     final String result = text.trimRight();
     final int characterBoundary = _getLeftByWord(_textPainter, text.length, false);
@@ -1004,8 +1004,8 @@ class RenderEditable extends RenderBox with RelayoutWhenSystemFontsChangeMixin {
     return text.substring(0, previousCharacter(text.length, text));
   }
 
-  void _handleDelete({ 
-    required bool forward, 
+  void _handleDelete({
+    required bool forward,
     bool isWordModifierPressed = false,
     bool isLineModifierPressed = false
   }) {
@@ -1018,19 +1018,19 @@ class RenderEditable extends RenderBox with RelayoutWhenSystemFontsChangeMixin {
     String textBefore = selection.textBefore(text);
     String textAfter = selection.textAfter(text);
     int cursorPosition = math.min(selection.start, selection.end);
-    
+
     // If not deleting a selection, delete the next/previous character.
     if (selection.isCollapsed) {
       if (!forward && textBefore.isNotEmpty) {
         final bool endsWithBreakLine = textBefore.codeUnitAt(textBefore.length - 1) == 0x0A;
         final bool hasModifier = isWordModifierPressed || isLineModifierPressed;
-        
+
         if (!hasModifier || endsWithBreakLine) {
           textBefore = _computeDeletedBeforeText(text: textBefore);
         } else {
           textBefore = _computeDeletedBeforeTextWithModifier(
-            text: textBefore, 
-            isWordModifierPressed: isWordModifierPressed, 
+            text: textBefore,
+            isWordModifierPressed: isWordModifierPressed,
             isLineModifierPressed: isLineModifierPressed
           );
         }

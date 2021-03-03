@@ -1561,353 +1561,352 @@ void main() {
       expect(delegate.textEditingValue.selection.isCollapsed, true);
       expect(delegate.textEditingValue.selection.baseOffset, 3);
     }, skip: isBrowser);
-  
-    group('with modifier keys on macOS', () {
-      setUp(() {
-        debugDefaultTargetPlatformOverride = TargetPlatform.macOS;
-      });
 
-      tearDown(() {
-        debugDefaultTargetPlatformOverride = null;
-      });
-      
-      test('handles blocks deletion with meta modifier when cursor is on last position', () async {
-        const String text = 'test with multiple blocks';
-        const int offset = text.length;
-        final TextSelectionDelegate delegate = FakeEditableTextState()
-          ..textEditingValue = const TextEditingValue(
-              text: text,
-              selection: TextSelection.collapsed(offset: offset),
-            );
-        final ViewportOffset viewportOffset = ViewportOffset.zero();
-        final RenderEditable editable = RenderEditable(
-          backgroundCursorColor: Colors.grey,
-          selectionColor: Colors.black,
-          textDirection: TextDirection.ltr,
-          cursorColor: Colors.red,
-          offset: viewportOffset,
-          textSelectionDelegate: delegate,
-          onSelectionChanged: (TextSelection selection, RenderEditable renderObject, SelectionChangedCause cause) {},
-          startHandleLayerLink: LayerLink(),
-          endHandleLayerLink: LayerLink(),
-          text: const TextSpan(
+    test('handles blocks deletion with line modifier when cursor is on last position', () async {
+      const String text = 'test with multiple blocks';
+      const int offset = text.length;
+      final TextSelectionDelegate delegate = FakeEditableTextState()
+        ..textEditingValue = const TextEditingValue(
             text: text,
-            style: TextStyle(
-              height: 1.0, fontSize: 10.0, fontFamily: 'Ahem',
-            ),
+            selection: TextSelection.collapsed(offset: offset),
+          );
+      final ViewportOffset viewportOffset = ViewportOffset.zero();
+      final RenderEditable editable = RenderEditable(
+        backgroundCursorColor: Colors.grey,
+        selectionColor: Colors.black,
+        textDirection: TextDirection.ltr,
+        cursorColor: Colors.red,
+        offset: viewportOffset,
+        textSelectionDelegate: delegate,
+        onSelectionChanged: (TextSelection selection, RenderEditable renderObject, SelectionChangedCause cause) {},
+        startHandleLayerLink: LayerLink(),
+        endHandleLayerLink: LayerLink(),
+        text: const TextSpan(
+          text: text,
+          style: TextStyle(
+            height: 1.0, fontSize: 10.0, fontFamily: 'Ahem',
           ),
-          selection: const TextSelection.collapsed(offset: offset),
-        );
+        ),
+        selection: const TextSelection.collapsed(offset: offset),
+      );
 
-        layout(editable);
-        editable.hasFocus = true;
-        pumpFrame();
+      layout(editable);
+      editable.hasFocus = true;
+      pumpFrame();
 
-        await simulateKeyDownEvent(LogicalKeyboardKey.meta, platform: 'macos');
-        await simulateKeyDownEvent(LogicalKeyboardKey.backspace);
-        await simulateKeyUpEvent(LogicalKeyboardKey.backspace);
-        await simulateKeyUpEvent(LogicalKeyboardKey.meta, platform: 'macos');
+      final LogicalKeyboardKey modifier = Platform.isMacOS ? LogicalKeyboardKey.meta : LogicalKeyboardKey.alt;
+      await simulateKeyDownEvent(modifier);
+      await simulateKeyDownEvent(LogicalKeyboardKey.backspace);
+      await simulateKeyUpEvent(LogicalKeyboardKey.backspace);
+      await simulateKeyUpEvent(modifier);
 
-        expect(delegate.textEditingValue.text, '');
-        expect(delegate.textEditingValue.selection.isCollapsed, true);
-        expect(delegate.textEditingValue.selection.baseOffset, 0);
-      }, skip: isBrowser);
+      expect(delegate.textEditingValue.text, '');
+      expect(delegate.textEditingValue.selection.isCollapsed, true);
+      expect(delegate.textEditingValue.selection.baseOffset, 0);
+    }, skip: isBrowser);
 
-      test('handles blocks deletion with meta modifier when cursor is on the middle of a block', () async {
-        const String text = 'test with multiple blocks';
-        const int offset = 8;
-        final TextSelectionDelegate delegate = FakeEditableTextState()
-          ..textEditingValue = const TextEditingValue(
-              text: text,
-              selection: TextSelection.collapsed(offset: offset),
-            );
-        final ViewportOffset viewportOffset = ViewportOffset.zero();
-        final RenderEditable editable = RenderEditable(
-          backgroundCursorColor: Colors.grey,
-          selectionColor: Colors.black,
-          textDirection: TextDirection.ltr,
-          cursorColor: Colors.red,
-          offset: viewportOffset,
-          textSelectionDelegate: delegate,
-          onSelectionChanged: (TextSelection selection, RenderEditable renderObject, SelectionChangedCause cause) {},
-          startHandleLayerLink: LayerLink(),
-          endHandleLayerLink: LayerLink(),
-          text: const TextSpan(
+    test('handles blocks deletion with line modifier when cursor is on the middle of a block', () async {
+      const String text = 'test with multiple blocks';
+      const int offset = 8;
+      final TextSelectionDelegate delegate = FakeEditableTextState()
+        ..textEditingValue = const TextEditingValue(
             text: text,
-            style: TextStyle(
-              height: 1.0, fontSize: 10.0, fontFamily: 'Ahem',
-            ),
+            selection: TextSelection.collapsed(offset: offset),
+          );
+      final ViewportOffset viewportOffset = ViewportOffset.zero();
+      final RenderEditable editable = RenderEditable(
+        backgroundCursorColor: Colors.grey,
+        selectionColor: Colors.black,
+        textDirection: TextDirection.ltr,
+        cursorColor: Colors.red,
+        offset: viewportOffset,
+        textSelectionDelegate: delegate,
+        onSelectionChanged: (TextSelection selection, RenderEditable renderObject, SelectionChangedCause cause) {},
+        startHandleLayerLink: LayerLink(),
+        endHandleLayerLink: LayerLink(),
+        text: const TextSpan(
+          text: text,
+          style: TextStyle(
+            height: 1.0, fontSize: 10.0, fontFamily: 'Ahem',
           ),
-          selection: const TextSelection.collapsed(offset: offset),
-        );
+        ),
+        selection: const TextSelection.collapsed(offset: offset),
+      );
 
-        layout(editable);
-        editable.hasFocus = true;
-        pumpFrame();
+      layout(editable);
+      editable.hasFocus = true;
+      pumpFrame();
 
-        await simulateKeyDownEvent(LogicalKeyboardKey.meta, platform: 'macos');
-        await simulateKeyDownEvent(LogicalKeyboardKey.backspace);
-        await simulateKeyUpEvent(LogicalKeyboardKey.backspace);
-        await simulateKeyUpEvent(LogicalKeyboardKey.meta, platform: 'macos');
+      final LogicalKeyboardKey modifier = Platform.isMacOS ? LogicalKeyboardKey.meta : LogicalKeyboardKey.alt;
+      await simulateKeyDownEvent(modifier);
+      await simulateKeyDownEvent(LogicalKeyboardKey.backspace);
+      await simulateKeyUpEvent(LogicalKeyboardKey.backspace);
+      await simulateKeyUpEvent(modifier);
 
-        expect(delegate.textEditingValue.text, 'h multiple blocks');
-        expect(delegate.textEditingValue.selection.isCollapsed, true);
-        expect(delegate.textEditingValue.selection.baseOffset, 0);
-      }, skip: isBrowser);
+      expect(delegate.textEditingValue.text, 'h multiple blocks');
+      expect(delegate.textEditingValue.selection.isCollapsed, true);
+      expect(delegate.textEditingValue.selection.baseOffset, 0);
+    }, skip: isBrowser);
 
-      test('handles block deletion with meta modifier when cursor is preceeded by break line', () async {
-        const String text = 'test with\n\n\nmultiple blocks';
-        const int offset = 12;
-        final TextSelectionDelegate delegate = FakeEditableTextState()
-          ..textEditingValue = const TextEditingValue(
-              text: text,
-              selection: TextSelection.collapsed(offset: offset),
-            );
-        final ViewportOffset viewportOffset = ViewportOffset.zero();
-        final RenderEditable editable = RenderEditable(
-          backgroundCursorColor: Colors.grey,
-          selectionColor: Colors.black,
-          textDirection: TextDirection.ltr,
-          cursorColor: Colors.red,
-          offset: viewportOffset,
-          textSelectionDelegate: delegate,
-          onSelectionChanged: (TextSelection selection, RenderEditable renderObject, SelectionChangedCause cause) {},
-          startHandleLayerLink: LayerLink(),
-          endHandleLayerLink: LayerLink(),
-          text: const TextSpan(
+    test('handles block deletion with line modifier when cursor is preceeded by break line', () async {
+      const String text = 'test with\n\n\nmultiple blocks';
+      const int offset = 12;
+      final TextSelectionDelegate delegate = FakeEditableTextState()
+        ..textEditingValue = const TextEditingValue(
             text: text,
-            style: TextStyle(
-              height: 1.0, fontSize: 10.0, fontFamily: 'Ahem',
-            ),
+            selection: TextSelection.collapsed(offset: offset),
+          );
+      final ViewportOffset viewportOffset = ViewportOffset.zero();
+      final RenderEditable editable = RenderEditable(
+        backgroundCursorColor: Colors.grey,
+        selectionColor: Colors.black,
+        textDirection: TextDirection.ltr,
+        cursorColor: Colors.red,
+        offset: viewportOffset,
+        textSelectionDelegate: delegate,
+        onSelectionChanged: (TextSelection selection, RenderEditable renderObject, SelectionChangedCause cause) {},
+        startHandleLayerLink: LayerLink(),
+        endHandleLayerLink: LayerLink(),
+        text: const TextSpan(
+          text: text,
+          style: TextStyle(
+            height: 1.0, fontSize: 10.0, fontFamily: 'Ahem',
           ),
-          selection: const TextSelection.collapsed(offset: offset),
-        );
+        ),
+        selection: const TextSelection.collapsed(offset: offset),
+      );
 
-        layout(editable);
-        editable.hasFocus = true;
-        pumpFrame();
+      layout(editable);
+      editable.hasFocus = true;
+      pumpFrame();
 
-        await simulateKeyDownEvent(LogicalKeyboardKey.meta, platform: 'macos');
-        await simulateKeyDownEvent(LogicalKeyboardKey.backspace);
-        await simulateKeyUpEvent(LogicalKeyboardKey.backspace);
-        await simulateKeyUpEvent(LogicalKeyboardKey.meta, platform: 'macos');
+      final LogicalKeyboardKey modifier = Platform.isMacOS ? LogicalKeyboardKey.meta : LogicalKeyboardKey.alt;
+      await simulateKeyDownEvent(modifier);
+      await simulateKeyDownEvent(LogicalKeyboardKey.backspace);
+      await simulateKeyUpEvent(LogicalKeyboardKey.backspace);
+      await simulateKeyUpEvent(modifier);
 
-        expect(delegate.textEditingValue.text, 'test with\n\nmultiple blocks');
-        expect(delegate.textEditingValue.selection.isCollapsed, true);
-        expect(delegate.textEditingValue.selection.baseOffset, 11);
-      }, skip: isBrowser);
+      expect(delegate.textEditingValue.text, 'test with\n\nmultiple blocks');
+      expect(delegate.textEditingValue.selection.isCollapsed, true);
+      expect(delegate.textEditingValue.selection.baseOffset, 11);
+    }, skip: isBrowser);
 
-      test('handles block deletion with alt modifier when cursor is on the middle of a block', () async {
-        const String text = 'test with multiple blocks';
-        const int offset = 8;
-        final TextSelectionDelegate delegate = FakeEditableTextState()
-          ..textEditingValue = const TextEditingValue(
-              text: text,
-              selection: TextSelection.collapsed(offset: offset),
-            );
-        final ViewportOffset viewportOffset = ViewportOffset.zero();
-        final RenderEditable editable = RenderEditable(
-          backgroundCursorColor: Colors.grey,
-          selectionColor: Colors.black,
-          textDirection: TextDirection.ltr,
-          cursorColor: Colors.red,
-          offset: viewportOffset,
-          textSelectionDelegate: delegate,
-          onSelectionChanged: (TextSelection selection, RenderEditable renderObject, SelectionChangedCause cause) {},
-          startHandleLayerLink: LayerLink(),
-          endHandleLayerLink: LayerLink(),
-          text: const TextSpan(
+    test('handles block deletion with alt modifier when cursor is on the middle of a block', () async {
+      const String text = 'test with multiple blocks';
+      const int offset = 8;
+      final TextSelectionDelegate delegate = FakeEditableTextState()
+        ..textEditingValue = const TextEditingValue(
             text: text,
-            style: TextStyle(
-              height: 1.0, fontSize: 10.0, fontFamily: 'Ahem',
-            ),
+            selection: TextSelection.collapsed(offset: offset),
+          );
+      final ViewportOffset viewportOffset = ViewportOffset.zero();
+      final RenderEditable editable = RenderEditable(
+        backgroundCursorColor: Colors.grey,
+        selectionColor: Colors.black,
+        textDirection: TextDirection.ltr,
+        cursorColor: Colors.red,
+        offset: viewportOffset,
+        textSelectionDelegate: delegate,
+        onSelectionChanged: (TextSelection selection, RenderEditable renderObject, SelectionChangedCause cause) {},
+        startHandleLayerLink: LayerLink(),
+        endHandleLayerLink: LayerLink(),
+        text: const TextSpan(
+          text: text,
+          style: TextStyle(
+            height: 1.0, fontSize: 10.0, fontFamily: 'Ahem',
           ),
-          selection: const TextSelection.collapsed(offset: offset),
-        );
+        ),
+        selection: const TextSelection.collapsed(offset: offset),
+      );
 
-        layout(editable);
-        editable.hasFocus = true;
-        pumpFrame();
+      layout(editable);
+      editable.hasFocus = true;
+      pumpFrame();
 
-        await simulateKeyDownEvent(LogicalKeyboardKey.alt);
-        await simulateKeyDownEvent(LogicalKeyboardKey.backspace);
-        await simulateKeyUpEvent(LogicalKeyboardKey.backspace);
-        await simulateKeyUpEvent(LogicalKeyboardKey.alt);
+      final LogicalKeyboardKey modifier = Platform.isMacOS ? LogicalKeyboardKey.alt : LogicalKeyboardKey.control;
+      await simulateKeyDownEvent(modifier);
+      await simulateKeyDownEvent(LogicalKeyboardKey.backspace);
+      await simulateKeyUpEvent(LogicalKeyboardKey.backspace);
+      await simulateKeyUpEvent(modifier);
 
-        expect(delegate.textEditingValue.text, 'test h multiple blocks');
-        expect(delegate.textEditingValue.selection.isCollapsed, true);
-        expect(delegate.textEditingValue.selection.baseOffset, 5);
-      }, skip: isBrowser);
+      expect(delegate.textEditingValue.text, 'test h multiple blocks');
+      expect(delegate.textEditingValue.selection.isCollapsed, true);
+      expect(delegate.textEditingValue.selection.baseOffset, 5);
+    }, skip: isBrowser);
 
-      test('handles block deletion with alt modifier when cursor is after a block', () async {
-        const String text = 'test with multiple blocks';
-        const int offset = 9;
-        final TextSelectionDelegate delegate = FakeEditableTextState()
-          ..textEditingValue = const TextEditingValue(
-              text: text,
-              selection: TextSelection.collapsed(offset: offset),
-            );
-        final ViewportOffset viewportOffset = ViewportOffset.zero();
-        final RenderEditable editable = RenderEditable(
-          backgroundCursorColor: Colors.grey,
-          selectionColor: Colors.black,
-          textDirection: TextDirection.ltr,
-          cursorColor: Colors.red,
-          offset: viewportOffset,
-          textSelectionDelegate: delegate,
-          onSelectionChanged: (TextSelection selection, RenderEditable renderObject, SelectionChangedCause cause) {},
-          startHandleLayerLink: LayerLink(),
-          endHandleLayerLink: LayerLink(),
-          text: const TextSpan(
+    test('handles block deletion with alt modifier when cursor is after a block', () async {
+      const String text = 'test with multiple blocks';
+      const int offset = 9;
+      final TextSelectionDelegate delegate = FakeEditableTextState()
+        ..textEditingValue = const TextEditingValue(
             text: text,
-            style: TextStyle(
-              height: 1.0, fontSize: 10.0, fontFamily: 'Ahem',
-            ),
+            selection: TextSelection.collapsed(offset: offset),
+          );
+      final ViewportOffset viewportOffset = ViewportOffset.zero();
+      final RenderEditable editable = RenderEditable(
+        backgroundCursorColor: Colors.grey,
+        selectionColor: Colors.black,
+        textDirection: TextDirection.ltr,
+        cursorColor: Colors.red,
+        offset: viewportOffset,
+        textSelectionDelegate: delegate,
+        onSelectionChanged: (TextSelection selection, RenderEditable renderObject, SelectionChangedCause cause) {},
+        startHandleLayerLink: LayerLink(),
+        endHandleLayerLink: LayerLink(),
+        text: const TextSpan(
+          text: text,
+          style: TextStyle(
+            height: 1.0, fontSize: 10.0, fontFamily: 'Ahem',
           ),
-          selection: const TextSelection.collapsed(offset: offset),
-        );
+        ),
+        selection: const TextSelection.collapsed(offset: offset),
+      );
 
-        layout(editable);
-        editable.hasFocus = true;
-        pumpFrame();
+      layout(editable);
+      editable.hasFocus = true;
+      pumpFrame();
 
-        await simulateKeyDownEvent(LogicalKeyboardKey.alt);
-        await simulateKeyDownEvent(LogicalKeyboardKey.backspace);
-        await simulateKeyUpEvent(LogicalKeyboardKey.backspace);
-        await simulateKeyUpEvent(LogicalKeyboardKey.alt);
+      final LogicalKeyboardKey modifier = Platform.isMacOS ? LogicalKeyboardKey.alt : LogicalKeyboardKey.control;
+      await simulateKeyDownEvent(modifier);
+      await simulateKeyDownEvent(LogicalKeyboardKey.backspace);
+      await simulateKeyUpEvent(LogicalKeyboardKey.backspace);
+      await simulateKeyUpEvent(modifier);
 
-        expect(delegate.textEditingValue.text, 'test  multiple blocks');
-        expect(delegate.textEditingValue.selection.isCollapsed, true);
-        expect(delegate.textEditingValue.selection.baseOffset, 5);
-      }, skip: isBrowser);
+      expect(delegate.textEditingValue.text, 'test  multiple blocks');
+      expect(delegate.textEditingValue.selection.isCollapsed, true);
+      expect(delegate.textEditingValue.selection.baseOffset, 5);
+    }, skip: isBrowser);
 
-      test('handles block deletion with alt modifier when cursor is preceeded by white spaces', () async {
-        const String text = 'test with   multiple blocks';
-        const int offset = 12;
-        final TextSelectionDelegate delegate = FakeEditableTextState()
-          ..textEditingValue = const TextEditingValue(
-              text: text,
-              selection: TextSelection.collapsed(offset: offset),
-            );
-        final ViewportOffset viewportOffset = ViewportOffset.zero();
-        final RenderEditable editable = RenderEditable(
-          backgroundCursorColor: Colors.grey,
-          selectionColor: Colors.black,
-          textDirection: TextDirection.ltr,
-          cursorColor: Colors.red,
-          offset: viewportOffset,
-          textSelectionDelegate: delegate,
-          onSelectionChanged: (TextSelection selection, RenderEditable renderObject, SelectionChangedCause cause) {},
-          startHandleLayerLink: LayerLink(),
-          endHandleLayerLink: LayerLink(),
-          text: const TextSpan(
+    test('handles block deletion with alt modifier when cursor is preceeded by white spaces', () async {
+      const String text = 'test with   multiple blocks';
+      const int offset = 12;
+      final TextSelectionDelegate delegate = FakeEditableTextState()
+        ..textEditingValue = const TextEditingValue(
             text: text,
-            style: TextStyle(
-              height: 1.0, fontSize: 10.0, fontFamily: 'Ahem',
-            ),
+            selection: TextSelection.collapsed(offset: offset),
+          );
+      final ViewportOffset viewportOffset = ViewportOffset.zero();
+      final RenderEditable editable = RenderEditable(
+        backgroundCursorColor: Colors.grey,
+        selectionColor: Colors.black,
+        textDirection: TextDirection.ltr,
+        cursorColor: Colors.red,
+        offset: viewportOffset,
+        textSelectionDelegate: delegate,
+        onSelectionChanged: (TextSelection selection, RenderEditable renderObject, SelectionChangedCause cause) {},
+        startHandleLayerLink: LayerLink(),
+        endHandleLayerLink: LayerLink(),
+        text: const TextSpan(
+          text: text,
+          style: TextStyle(
+            height: 1.0, fontSize: 10.0, fontFamily: 'Ahem',
           ),
-          selection: const TextSelection.collapsed(offset: offset),
-        );
+        ),
+        selection: const TextSelection.collapsed(offset: offset),
+      );
 
-        layout(editable);
-        editable.hasFocus = true;
-        pumpFrame();
+      layout(editable);
+      editable.hasFocus = true;
+      pumpFrame();
 
-        await simulateKeyDownEvent(LogicalKeyboardKey.alt);
-        await simulateKeyDownEvent(LogicalKeyboardKey.backspace);
-        await simulateKeyUpEvent(LogicalKeyboardKey.backspace);
-        await simulateKeyUpEvent(LogicalKeyboardKey.alt);
+      final LogicalKeyboardKey modifier = Platform.isMacOS ? LogicalKeyboardKey.alt : LogicalKeyboardKey.control;
+      await simulateKeyDownEvent(modifier);
+      await simulateKeyDownEvent(LogicalKeyboardKey.backspace);
+      await simulateKeyUpEvent(LogicalKeyboardKey.backspace);
+      await simulateKeyUpEvent(modifier);
 
-        expect(delegate.textEditingValue.text, 'test multiple blocks');
-        expect(delegate.textEditingValue.selection.isCollapsed, true);
-        expect(delegate.textEditingValue.selection.baseOffset, 5);
-      }, skip: isBrowser);
+      expect(delegate.textEditingValue.text, 'test multiple blocks');
+      expect(delegate.textEditingValue.selection.isCollapsed, true);
+      expect(delegate.textEditingValue.selection.baseOffset, 5);
+    }, skip: isBrowser);
 
-      test('handles block deletion with alt modifier when cursor is preceeded by tabs spaces', () async {
-        const String text = 'test with\t\t\tmultiple blocks';
-        const int offset = 12;
-        final TextSelectionDelegate delegate = FakeEditableTextState()
-          ..textEditingValue = const TextEditingValue(
-              text: text,
-              selection: TextSelection.collapsed(offset: offset),
-            );
-        final ViewportOffset viewportOffset = ViewportOffset.zero();
-        final RenderEditable editable = RenderEditable(
-          backgroundCursorColor: Colors.grey,
-          selectionColor: Colors.black,
-          textDirection: TextDirection.ltr,
-          cursorColor: Colors.red,
-          offset: viewportOffset,
-          textSelectionDelegate: delegate,
-          onSelectionChanged: (TextSelection selection, RenderEditable renderObject, SelectionChangedCause cause) {},
-          startHandleLayerLink: LayerLink(),
-          endHandleLayerLink: LayerLink(),
-          text: const TextSpan(
+    test('handles block deletion with alt modifier when cursor is preceeded by tabs spaces', () async {
+      const String text = 'test with\t\t\tmultiple blocks';
+      const int offset = 12;
+      final TextSelectionDelegate delegate = FakeEditableTextState()
+        ..textEditingValue = const TextEditingValue(
             text: text,
-            style: TextStyle(
-              height: 1.0, fontSize: 10.0, fontFamily: 'Ahem',
-            ),
+            selection: TextSelection.collapsed(offset: offset),
+          );
+      final ViewportOffset viewportOffset = ViewportOffset.zero();
+      final RenderEditable editable = RenderEditable(
+        backgroundCursorColor: Colors.grey,
+        selectionColor: Colors.black,
+        textDirection: TextDirection.ltr,
+        cursorColor: Colors.red,
+        offset: viewportOffset,
+        textSelectionDelegate: delegate,
+        onSelectionChanged: (TextSelection selection, RenderEditable renderObject, SelectionChangedCause cause) {},
+        startHandleLayerLink: LayerLink(),
+        endHandleLayerLink: LayerLink(),
+        text: const TextSpan(
+          text: text,
+          style: TextStyle(
+            height: 1.0, fontSize: 10.0, fontFamily: 'Ahem',
           ),
-          selection: const TextSelection.collapsed(offset: offset),
-        );
+        ),
+        selection: const TextSelection.collapsed(offset: offset),
+      );
 
-        layout(editable);
-        editable.hasFocus = true;
-        pumpFrame();
+      layout(editable);
+      editable.hasFocus = true;
+      pumpFrame();
 
-        await simulateKeyDownEvent(LogicalKeyboardKey.alt);
-        await simulateKeyDownEvent(LogicalKeyboardKey.backspace);
-        await simulateKeyUpEvent(LogicalKeyboardKey.backspace);
-        await simulateKeyUpEvent(LogicalKeyboardKey.alt);
+      final LogicalKeyboardKey modifier = Platform.isMacOS ? LogicalKeyboardKey.alt : LogicalKeyboardKey.control;
+      await simulateKeyDownEvent(modifier);
+      await simulateKeyDownEvent(LogicalKeyboardKey.backspace);
+      await simulateKeyUpEvent(LogicalKeyboardKey.backspace);
+      await simulateKeyUpEvent(modifier);
 
-        expect(delegate.textEditingValue.text, 'test multiple blocks');
-        expect(delegate.textEditingValue.selection.isCollapsed, true);
-        expect(delegate.textEditingValue.selection.baseOffset, 5);
-      }, skip: isBrowser);
-      
-      test('handles block deletion with alt modifier when cursor is preceeded by break line', () async {
-        const String text = 'test with\n\n\nmultiple blocks';
-        const int offset = 12;
-        final TextSelectionDelegate delegate = FakeEditableTextState()
-          ..textEditingValue = const TextEditingValue(
-              text: text,
-              selection: TextSelection.collapsed(offset: offset),
-            );
-        final ViewportOffset viewportOffset = ViewportOffset.zero();
-        final RenderEditable editable = RenderEditable(
-          backgroundCursorColor: Colors.grey,
-          selectionColor: Colors.black,
-          textDirection: TextDirection.ltr,
-          cursorColor: Colors.red,
-          offset: viewportOffset,
-          textSelectionDelegate: delegate,
-          onSelectionChanged: (TextSelection selection, RenderEditable renderObject, SelectionChangedCause cause) {},
-          startHandleLayerLink: LayerLink(),
-          endHandleLayerLink: LayerLink(),
-          text: const TextSpan(
+      expect(delegate.textEditingValue.text, 'test multiple blocks');
+      expect(delegate.textEditingValue.selection.isCollapsed, true);
+      expect(delegate.textEditingValue.selection.baseOffset, 5);
+    }, skip: isBrowser);
+
+    test('handles block deletion with alt modifier when cursor is preceeded by break line', () async {
+      const String text = 'test with\n\n\nmultiple blocks';
+      const int offset = 12;
+      final TextSelectionDelegate delegate = FakeEditableTextState()
+        ..textEditingValue = const TextEditingValue(
             text: text,
-            style: TextStyle(
-              height: 1.0, fontSize: 10.0, fontFamily: 'Ahem',
-            ),
+            selection: TextSelection.collapsed(offset: offset),
+          );
+      final ViewportOffset viewportOffset = ViewportOffset.zero();
+      final RenderEditable editable = RenderEditable(
+        backgroundCursorColor: Colors.grey,
+        selectionColor: Colors.black,
+        textDirection: TextDirection.ltr,
+        cursorColor: Colors.red,
+        offset: viewportOffset,
+        textSelectionDelegate: delegate,
+        onSelectionChanged: (TextSelection selection, RenderEditable renderObject, SelectionChangedCause cause) {},
+        startHandleLayerLink: LayerLink(),
+        endHandleLayerLink: LayerLink(),
+        text: const TextSpan(
+          text: text,
+          style: TextStyle(
+            height: 1.0, fontSize: 10.0, fontFamily: 'Ahem',
           ),
-          selection: const TextSelection.collapsed(offset: offset),
-        );
+        ),
+        selection: const TextSelection.collapsed(offset: offset),
+      );
 
-        layout(editable);
-        editable.hasFocus = true;
-        pumpFrame();
+      layout(editable);
+      editable.hasFocus = true;
+      pumpFrame();
 
-        await simulateKeyDownEvent(LogicalKeyboardKey.alt);
-        await simulateKeyDownEvent(LogicalKeyboardKey.backspace);
-        await simulateKeyUpEvent(LogicalKeyboardKey.backspace);
-        await simulateKeyUpEvent(LogicalKeyboardKey.alt);
+      final LogicalKeyboardKey modifier = Platform.isMacOS ? LogicalKeyboardKey.alt : LogicalKeyboardKey.control;
+      await simulateKeyDownEvent(modifier);
+      await simulateKeyDownEvent(LogicalKeyboardKey.backspace);
+      await simulateKeyUpEvent(LogicalKeyboardKey.backspace);
+      await simulateKeyUpEvent(modifier);
 
-        expect(delegate.textEditingValue.text, 'test with\n\nmultiple blocks');
-        expect(delegate.textEditingValue.selection.isCollapsed, true);
-        expect(delegate.textEditingValue.selection.baseOffset, 11);
-      }, skip: isBrowser);
-    
-      test('handles block deletion with alt modifier when using cjk chinese', () async {
+      expect(delegate.textEditingValue.text, 'test with\n\nmultiple blocks');
+      expect(delegate.textEditingValue.selection.isCollapsed, true);
+      expect(delegate.textEditingValue.selection.baseOffset, 11);
+    }, skip: isBrowser);
+
+    test('handles block deletion with alt modifier when using cjk chinese', () async {
         const String text = '用多個塊測試';
         const int offset = 4;
         final TextSelectionDelegate delegate = FakeEditableTextState()
@@ -1939,152 +1938,16 @@ void main() {
         editable.hasFocus = true;
         pumpFrame();
 
-        await simulateKeyDownEvent(LogicalKeyboardKey.alt);
+        final LogicalKeyboardKey modifier = Platform.isMacOS ? LogicalKeyboardKey.alt : LogicalKeyboardKey.control;
+        await simulateKeyDownEvent(modifier);
         await simulateKeyDownEvent(LogicalKeyboardKey.backspace);
         await simulateKeyUpEvent(LogicalKeyboardKey.backspace);
-        await simulateKeyUpEvent(LogicalKeyboardKey.alt);
+        await simulateKeyUpEvent(modifier);
 
         expect(delegate.textEditingValue.text, '用多個測試');
         expect(delegate.textEditingValue.selection.isCollapsed, true);
         expect(delegate.textEditingValue.selection.baseOffset, 3);
       }, skip: isBrowser);
-    });
-  
-    group('with modifier keys and not using macOS', () {
-      setUp(() {
-        debugDefaultTargetPlatformOverride = TargetPlatform.windows;
-      });
-
-      tearDown(() {
-        debugDefaultTargetPlatformOverride = null;
-      });
-      
-      test('ignores blocks deletion with meta modifier', () async {
-        const String text = 'test with multiple blocks';
-        const int offset = text.length;
-        final TextSelectionDelegate delegate = FakeEditableTextState()
-          ..textEditingValue = const TextEditingValue(
-              text: text,
-              selection: TextSelection.collapsed(offset: offset),
-            );
-        final ViewportOffset viewportOffset = ViewportOffset.zero();
-        final RenderEditable editable = RenderEditable(
-          backgroundCursorColor: Colors.grey,
-          selectionColor: Colors.black,
-          textDirection: TextDirection.ltr,
-          cursorColor: Colors.red,
-          offset: viewportOffset,
-          textSelectionDelegate: delegate,
-          onSelectionChanged: (TextSelection selection, RenderEditable renderObject, SelectionChangedCause cause) {},
-          startHandleLayerLink: LayerLink(),
-          endHandleLayerLink: LayerLink(),
-          text: const TextSpan(
-            text: text,
-            style: TextStyle(
-              height: 1.0, fontSize: 10.0, fontFamily: 'Ahem',
-            ),
-          ),
-          selection: const TextSelection.collapsed(offset: offset),
-        );
-
-        layout(editable);
-        editable.hasFocus = true;
-        pumpFrame();
-
-        await simulateKeyDownEvent(LogicalKeyboardKey.meta);
-        await simulateKeyDownEvent(LogicalKeyboardKey.backspace);
-        await simulateKeyUpEvent(LogicalKeyboardKey.backspace);
-        await simulateKeyUpEvent(LogicalKeyboardKey.meta);
-
-        expect(delegate.textEditingValue.text, text);
-        expect(delegate.textEditingValue.selection.isCollapsed, true);
-        expect(delegate.textEditingValue.selection.baseOffset, offset);
-      }, skip: isBrowser);
-
-      test('handles block deletion with alt modifier', () async {
-        const String text = 'test with multiple blocks';
-        const int offset = 8;
-        final TextSelectionDelegate delegate = FakeEditableTextState()
-          ..textEditingValue = const TextEditingValue(
-              text: text,
-              selection: TextSelection.collapsed(offset: offset),
-            );
-        final ViewportOffset viewportOffset = ViewportOffset.zero();
-        final RenderEditable editable = RenderEditable(
-          backgroundCursorColor: Colors.grey,
-          selectionColor: Colors.black,
-          textDirection: TextDirection.ltr,
-          cursorColor: Colors.red,
-          offset: viewportOffset,
-          textSelectionDelegate: delegate,
-          onSelectionChanged: (TextSelection selection, RenderEditable renderObject, SelectionChangedCause cause) {},
-          startHandleLayerLink: LayerLink(),
-          endHandleLayerLink: LayerLink(),
-          text: const TextSpan(
-            text: text,
-            style: TextStyle(
-              height: 1.0, fontSize: 10.0, fontFamily: 'Ahem',
-            ),
-          ),
-          selection: const TextSelection.collapsed(offset: offset),
-        );
-
-        layout(editable);
-        editable.hasFocus = true;
-        pumpFrame();
-
-        await simulateKeyDownEvent(LogicalKeyboardKey.alt);
-        await simulateKeyDownEvent(LogicalKeyboardKey.backspace);
-        await simulateKeyUpEvent(LogicalKeyboardKey.alt);
-        await simulateKeyUpEvent(LogicalKeyboardKey.control);
-
-        expect(delegate.textEditingValue.text, 'h multiple blocks');
-        expect(delegate.textEditingValue.selection.isCollapsed, true);
-        expect(delegate.textEditingValue.selection.baseOffset, 0);
-      }, skip: isBrowser);
-
-      test('handles block deletion with ctrl modifier', () async {
-        const String text = 'test with multiple blocks';
-        const int offset = 8;
-        final TextSelectionDelegate delegate = FakeEditableTextState()
-          ..textEditingValue = const TextEditingValue(
-              text: text,
-              selection: TextSelection.collapsed(offset: offset),
-            );
-        final ViewportOffset viewportOffset = ViewportOffset.zero();
-        final RenderEditable editable = RenderEditable(
-          backgroundCursorColor: Colors.grey,
-          selectionColor: Colors.black,
-          textDirection: TextDirection.ltr,
-          cursorColor: Colors.red,
-          offset: viewportOffset,
-          textSelectionDelegate: delegate,
-          onSelectionChanged: (TextSelection selection, RenderEditable renderObject, SelectionChangedCause cause) {},
-          startHandleLayerLink: LayerLink(),
-          endHandleLayerLink: LayerLink(),
-          text: const TextSpan(
-            text: text,
-            style: TextStyle(
-              height: 1.0, fontSize: 10.0, fontFamily: 'Ahem',
-            ),
-          ),
-          selection: const TextSelection.collapsed(offset: offset),
-        );
-
-        layout(editable);
-        editable.hasFocus = true;
-        pumpFrame();
-
-        await simulateKeyDownEvent(LogicalKeyboardKey.control);
-        await simulateKeyDownEvent(LogicalKeyboardKey.backspace);
-        await simulateKeyUpEvent(LogicalKeyboardKey.backspace);
-        await simulateKeyUpEvent(LogicalKeyboardKey.control);
-
-        expect(delegate.textEditingValue.text, 'test h multiple blocks');
-        expect(delegate.textEditingValue.selection.isCollapsed, true);
-        expect(delegate.textEditingValue.selection.baseOffset, 5);
-      }, skip: isBrowser);
-    });
   });
 
   test('getEndpointsForSelection handles empty characters', () {
