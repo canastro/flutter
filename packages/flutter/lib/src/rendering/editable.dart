@@ -656,15 +656,34 @@ class RenderEditable extends RenderBox with RelayoutWhenSystemFontsChangeMixin {
     final bool isShortcutModifierPressed = isMacOS ? keyEvent.isMetaPressed : keyEvent.isControlPressed;
     if (_movementKeys.contains(key)) {
       _handleMovement(key, wordModifier: isWordModifierPressed, lineModifier: isLineModifierPressed, shift: keyEvent.isShiftPressed);
+    } else if (key == LogicalKeyboardKey.delete) {
+      _handleDelete(forward: true);
+    } else if (key == LogicalKeyboardKey.backspace) {
+      _handleDelete(forward: false, altModifier: keyEvent.isAltPressed, metaModifier: keyEvent.isMetaPressed);
     } else if (isShortcutModifierPressed && _shortcutKeys.contains(key)) {
       // _handleShortcuts depends on being started in the same stack invocation
       // as the _handleKeyEvent method
       _handleShortcuts(key);
-    } else if (key == LogicalKeyboardKey.delete) {
-      _handleDelete(forward: true);
-    } else if (key == LogicalKeyboardKey.backspace) {
-      _handleDelete(forward: false);
+    } 
+  }
+
+  // Return the offset at the start of the nearest word to the left of the given
+  // offset.
+  static int _getLeftByWord(TextPainter textPainter, int offset, [bool includeWhitespace = true]) {
+    // If the offset is already all the way left, there is nothing to do.
+    if (offset <= 0) {
+      return offset;
     }
+
+    // If we can just return the start of the text without checking for a word.
+    if (offset == 1) {
+      return 0;
+    }
+
+    final String text = textPainter.text!.toPlainText();
+    final int startPoint = previousCharacter(offset, text, includeWhitespace);
+    final TextRange word = textPainter.getWordBoundary(TextPosition(offset: startPoint));
+    return word.start;
   }
 
   /// Returns the index into the string of the next character boundary after the
@@ -956,7 +975,38 @@ class RenderEditable extends RenderBox with RelayoutWhenSystemFontsChangeMixin {
     }
   }
 
-  void _handleDelete({ required bool forward }) {
+  /// Computes the text after a delete event with a alt or meta modifier
+  String _computeBeforeTextWithBlockBackspace({ 
+    required String text, 
+    bool metaModifier = false, 
+    bool altModifier = false 
+  }) {
+    // if both modifiers are true, then we should ignore.
+    if (metaModifier && altModifier) {
+      return text;
+    }
+
+    if (metaModifier) {
+      return ''; 
+    } 
+
+    String result = text.trimRight();
+    final int characterBoundary = _getLeftByWord(_textPainter, text.length - 1, false);
+    result = result.substring(0, characterBoundary);
+    return result;
+  }
+
+  /// Computes the text after a delete event
+  String _computeBeforeTextWithBackspace({ required String text }) {
+    final int characterBoundary = previousCharacter(text.length, text);
+    return text.substring(0, characterBoundary);
+  }
+
+  void _handleDelete({ 
+    required bool forward, 
+    bool altModifier = false, 
+    bool metaModifier = false 
+  }) {
     final TextSelection selection = textSelectionDelegate.textEditingValue.selection;
     final String text = textSelectionDelegate.textEditingValue.text;
     assert(_selection != null);
@@ -966,18 +1016,32 @@ class RenderEditable extends RenderBox with RelayoutWhenSystemFontsChangeMixin {
     String textBefore = selection.textBefore(text);
     String textAfter = selection.textAfter(text);
     int cursorPosition = math.min(selection.start, selection.end);
+    
     // If not deleting a selection, delete the next/previous character.
     if (selection.isCollapsed) {
       if (!forward && textBefore.isNotEmpty) {
-        final int characterBoundary = previousCharacter(textBefore.length, textBefore);
-        textBefore = textBefore.substring(0, characterBoundary);
-        cursorPosition = characterBoundary;
+        final bool endsWithBreakLine = textBefore.codeUnitAt(textBefore.length - 1) == 0x0A;
+        final bool hasModifier = metaModifier || altModifier;
+        
+        if (!hasModifier || endsWithBreakLine) {
+          textBefore = _computeBeforeTextWithBackspace(text: textBefore);
+        } else {
+          textBefore = _computeBeforeTextWithBlockBackspace(
+            text: textBefore, 
+            altModifier: altModifier, 
+            metaModifier: metaModifier
+          );
+        }
+
+        cursorPosition = textBefore.length;
       }
+
       if (forward && textAfter.isNotEmpty) {
         final int deleteCount = nextCharacter(0, textAfter);
         textAfter = textAfter.substring(deleteCount);
       }
     }
+
     final TextSelection newSelection = TextSelection.collapsed(offset: cursorPosition);
     _setTextEditingValue(
       TextEditingValue(
