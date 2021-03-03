@@ -1562,7 +1562,7 @@ void main() {
       expect(delegate.textEditingValue.selection.baseOffset, 3);
     }, skip: isBrowser);
   
-    group('when using macOS', () {
+    group('with modifier keys on macOS', () {
       setUp(() {
         debugDefaultTargetPlatformOverride = TargetPlatform.macOS;
       });
@@ -1950,7 +1950,7 @@ void main() {
       }, skip: isBrowser);
     });
   
-    group('when not using macOS', () {
+    group('with modifier keys and not using macOS', () {
       setUp(() {
         debugDefaultTargetPlatformOverride = TargetPlatform.windows;
       });
@@ -1999,6 +1999,48 @@ void main() {
         expect(delegate.textEditingValue.text, text);
         expect(delegate.textEditingValue.selection.isCollapsed, true);
         expect(delegate.textEditingValue.selection.baseOffset, offset);
+      }, skip: isBrowser);
+
+      test('handles block deletion with alt modifier', () async {
+        const String text = 'test with multiple blocks';
+        const int offset = 8;
+        final TextSelectionDelegate delegate = FakeEditableTextState()
+          ..textEditingValue = const TextEditingValue(
+              text: text,
+              selection: TextSelection.collapsed(offset: offset),
+            );
+        final ViewportOffset viewportOffset = ViewportOffset.zero();
+        final RenderEditable editable = RenderEditable(
+          backgroundCursorColor: Colors.grey,
+          selectionColor: Colors.black,
+          textDirection: TextDirection.ltr,
+          cursorColor: Colors.red,
+          offset: viewportOffset,
+          textSelectionDelegate: delegate,
+          onSelectionChanged: (TextSelection selection, RenderEditable renderObject, SelectionChangedCause cause) {},
+          startHandleLayerLink: LayerLink(),
+          endHandleLayerLink: LayerLink(),
+          text: const TextSpan(
+            text: text,
+            style: TextStyle(
+              height: 1.0, fontSize: 10.0, fontFamily: 'Ahem',
+            ),
+          ),
+          selection: const TextSelection.collapsed(offset: offset),
+        );
+
+        layout(editable);
+        editable.hasFocus = true;
+        pumpFrame();
+
+        await simulateKeyDownEvent(LogicalKeyboardKey.alt);
+        await simulateKeyDownEvent(LogicalKeyboardKey.backspace);
+        await simulateKeyUpEvent(LogicalKeyboardKey.alt);
+        await simulateKeyUpEvent(LogicalKeyboardKey.control);
+
+        expect(delegate.textEditingValue.text, 'h multiple blocks');
+        expect(delegate.textEditingValue.selection.isCollapsed, true);
+        expect(delegate.textEditingValue.selection.baseOffset, 0);
       }, skip: isBrowser);
 
       test('handles block deletion with ctrl modifier', () async {
