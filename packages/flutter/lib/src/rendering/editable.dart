@@ -637,7 +637,7 @@ class RenderEditable extends RenderBox with RelayoutWhenSystemFontsChangeMixin {
     final Set<LogicalKeyboardKey> keysPressed = LogicalKeyboardKey.collapseSynonyms(RawKeyboard.instance.keysPressed);
     final LogicalKeyboardKey key = keyEvent.logicalKey;
 
-    final bool isMacOS = keyEvent.data is RawKeyEventDataMacOs;
+    final bool isMacOS = defaultTargetPlatform == TargetPlatform.macOS;
     if (!_nonModifierKeys.contains(key) ||
         keysPressed.difference(isMacOS ? _macOsModifierKeys : _modifierKeys).length > 1 ||
         keysPressed.difference(_interestingKeys).isNotEmpty) {
@@ -659,7 +659,11 @@ class RenderEditable extends RenderBox with RelayoutWhenSystemFontsChangeMixin {
     } else if (key == LogicalKeyboardKey.delete) {
       _handleDelete(forward: true);
     } else if (key == LogicalKeyboardKey.backspace) {
-      _handleDelete(forward: false, altModifier: keyEvent.isAltPressed, metaModifier: keyEvent.isMetaPressed);
+      _handleDelete(
+        forward: false, 
+        isWordModifierPressed: isWordModifierPressed, 
+        isLineModifierPressed: isLineModifierPressed
+      );
     } else if (isShortcutModifierPressed && _shortcutKeys.contains(key)) {
       // _handleShortcuts depends on being started in the same stack invocation
       // as the _handleKeyEvent method
@@ -978,15 +982,15 @@ class RenderEditable extends RenderBox with RelayoutWhenSystemFontsChangeMixin {
   /// Computes the text after a delete event with a alt or meta modifier
   String _computeBeforeTextWithBlockBackspace({ 
     required String text, 
-    bool metaModifier = false, 
-    bool altModifier = false 
+    bool isWordModifierPressed = false, 
+    bool isLineModifierPressed = false 
   }) {
     // if both modifiers are true, then we should ignore.
-    if (metaModifier && altModifier) {
+    if (isLineModifierPressed && isWordModifierPressed) {
       return text;
     }
 
-    if (metaModifier) {
+    if (isLineModifierPressed) {
       return ''; 
     } 
 
@@ -1002,8 +1006,8 @@ class RenderEditable extends RenderBox with RelayoutWhenSystemFontsChangeMixin {
 
   void _handleDelete({ 
     required bool forward, 
-    bool altModifier = false, 
-    bool metaModifier = false 
+    bool isWordModifierPressed = false,
+    bool isLineModifierPressed = false
   }) {
     final TextSelection selection = textSelectionDelegate.textEditingValue.selection;
     final String text = textSelectionDelegate.textEditingValue.text;
@@ -1019,15 +1023,15 @@ class RenderEditable extends RenderBox with RelayoutWhenSystemFontsChangeMixin {
     if (selection.isCollapsed) {
       if (!forward && textBefore.isNotEmpty) {
         final bool endsWithBreakLine = textBefore.codeUnitAt(textBefore.length - 1) == 0x0A;
-        final bool hasModifier = metaModifier || altModifier;
+        final bool hasModifier = isWordModifierPressed || isLineModifierPressed;
         
         if (!hasModifier || endsWithBreakLine) {
           textBefore = _computeBeforeTextWithBackspace(text: textBefore);
         } else {
           textBefore = _computeBeforeTextWithBlockBackspace(
             text: textBefore, 
-            altModifier: altModifier, 
-            metaModifier: metaModifier
+            isWordModifierPressed: isWordModifierPressed, 
+            isLineModifierPressed: isLineModifierPressed
           );
         }
 
